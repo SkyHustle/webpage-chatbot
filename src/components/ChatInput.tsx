@@ -80,6 +80,7 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
                     minRows={1}
                     maxRows={4}
                     autoFocus
+                    disabled={isPending}
                     placeholder="Type a message"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
