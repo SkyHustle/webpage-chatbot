@@ -1,6 +1,13 @@
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { FC, HTMLAttributes, useContext, useState, useRef } from "react";
+import {
+    FC,
+    HTMLAttributes,
+    useContext,
+    useState,
+    useRef,
+    useEffect,
+} from "react";
 import TextAreaAutosize from "react-textarea-autosize";
 import { nanoid } from "nanoid";
 import { Message } from "@/lib/validators/message";
@@ -21,7 +28,11 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
 
     const textareaRef = useRef<null | HTMLTextAreaElement>(null);
 
-    const { mutate: sendMessage, isPending } = useMutation({
+    const {
+        mutate: sendMessage,
+        isPending,
+        isSuccess,
+    } = useMutation({
         mutationFn: async (message: Message) => {
             const response = await fetch("/api/message", {
                 method: "POST",
@@ -61,14 +72,16 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
                 console.log(chunkValue);
                 updateMessage(id, (prev) => prev + chunkValue);
             }
-            // clean up
             setIsMessageUpdating(false);
-            setInput("");
-            setTimeout(() => {
-                textareaRef.current?.focus();
-            }, 10);
         },
     });
+
+    useEffect(() => {
+        if (isSuccess) {
+            setInput("");
+            textareaRef.current?.focus();
+        }
+    }, [isSuccess]);
 
     return (
         <div {...props} className={cn("border-t border-zinc-300", className)}>
