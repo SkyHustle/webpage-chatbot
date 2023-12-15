@@ -44,7 +44,6 @@ const ChatMessages: FC<ChatMessagesProps> = ({ className, ...props }) => {
                     </div>
                 </div>
             ))}
-            ChatMessages
         </div>
     );
 };

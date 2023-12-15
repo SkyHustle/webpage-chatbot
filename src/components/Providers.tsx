@@ -1,6 +1,7 @@
 // client component that encapsulates all the Context Providers in our app
 "use client";
 
+import { MessagesProvider } from "@/context/messages";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { FC } from "react";
 
@@ -12,7 +13,7 @@ const Providers: FC<ProvidersProps> = ({ children }) => {
     const queryClient = new QueryClient();
     return (
         <QueryClientProvider client={queryClient}>
-            {children}
+            <MessagesProvider>{children}</MessagesProvider>
         </QueryClientProvider>
     );
 };
