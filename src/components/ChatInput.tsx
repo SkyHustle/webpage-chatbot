@@ -19,7 +19,7 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
         setIsMessageUpdating,
     } = useContext(MessagesContext);
 
-    // const textareaRef = useRef<null | HTMLTextAreaElement>(null);
+    const textareaRef = useRef<null | HTMLTextAreaElement>(null);
 
     const { mutate: sendMessage, isPending } = useMutation({
         mutationFn: async (message: Message) => {
@@ -64,11 +64,9 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
             // clean up
             setIsMessageUpdating(false);
             setInput("");
-            // textareaRef.current?.focus();
-
-            // setTimeout(() => {
-            //     textareaRef.current?.focus()
-            // }, 10)
+            setTimeout(() => {
+                textareaRef.current?.focus();
+            }, 10);
         },
     });
 
@@ -76,7 +74,7 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
         <div {...props} className={cn("border-t border-zinc-300", className)}>
             <div className="relative mt-4 flex-1 overflow-hidden rounded-lg border-none outline-none">
                 <TextAreaAutosize
-                    // ref={textareaRef}
+                    ref={textareaRef}
                     minRows={1}
                     maxRows={4}
                     autoFocus
