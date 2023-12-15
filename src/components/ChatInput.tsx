@@ -5,6 +5,7 @@ import TextAreaAutosize from "react-textarea-autosize";
 import { nanoid } from "nanoid";
 import { Message } from "@/lib/validators/message";
 import { MessagesContext } from "@/context/messages";
+import { CornerDownLeft, Loader2 } from "lucide-react";
 
 interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -95,6 +96,15 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
                     }}
                     className="peer disabled:opacity-50 pr-14 resize-none block w-full border-0 bg-zinc-100 py-1.5 text-gray-900 focus:ring-0 text-sm sm:leading-6"
                 />
+                <div className="absolute inset-y-0 right-0 flex py-1.5 pr-1.5">
+                    <div className="inline-flex items-center rounded border bg-white border-gray-200 px-1 font-sans text-xs text-gray-400">
+                        {isPending ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                            <CornerDownLeft className="w-3 h-3" />
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
