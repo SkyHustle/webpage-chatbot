@@ -13,6 +13,7 @@ import { nanoid } from "nanoid";
 import { Message } from "@/lib/validators/message";
 import { MessagesContext } from "@/context/messages";
 import { CornerDownLeft, Loader2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -32,6 +33,7 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
         mutate: sendMessage,
         isPending,
         isSuccess,
+        isError,
     } = useMutation({
         mutationFn: async (message: Message) => {
             const response = await fetch("/api/message", {
@@ -41,11 +43,20 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
                 },
                 body: JSON.stringify({ messages: [message] }),
             });
+
+            if (!response.ok) {
+                throw new Error();
+            }
             return response.body;
         },
         // optimistic update to messages area
         onMutate(message) {
             addMessage(message);
+        },
+        onError: (_, message) => {
+            console.log("onError");
+            toast.error("Oops, something went wrong, please try again");
+            removeMessage(message.id);
         },
         onSuccess: async (stream) => {
             if (!stream) throw new Error("No stream found");
@@ -77,11 +88,11 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
     });
 
     useEffect(() => {
-        if (isSuccess) {
+        if (isSuccess || isError) {
             setInput("");
             textareaRef.current?.focus();
         }
-    }, [isSuccess]);
+    }, [isSuccess, isError]);
 
     return (
         <div {...props} className={cn("border-t border-zinc-300", className)}>
