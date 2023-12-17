@@ -32,6 +32,12 @@ const ChatInput = () => {
             if (!response.ok) {
                 throw new Error();
             }
+            console.log(
+                "Response: ",
+                response,
+                "Response body: ",
+                response.body
+            );
             return response.body;
         },
         // optimistic update to messages area
@@ -39,13 +45,11 @@ const ChatInput = () => {
             addMessage(message);
         },
         onError: (_, message) => {
-            console.log("onError");
             toast.error("Oops, something went wrong, please try again");
             removeMessage(message.id);
         },
         onSuccess: async (stream) => {
             if (!stream) throw new Error("No stream found");
-            console.log("success");
 
             const id = nanoid();
             const responseMessage: Message = {
@@ -65,7 +69,7 @@ const ChatInput = () => {
                 const { value, done: doneReading } = await reader.read();
                 done = doneReading;
                 const chunkValue = decoder.decode(value);
-                console.log(chunkValue);
+                // console.log(chunkValue);
                 updateMessage(id, (prev) => prev + chunkValue);
             }
             setIsMessageUpdating(false);

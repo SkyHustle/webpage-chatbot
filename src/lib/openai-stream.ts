@@ -12,24 +12,28 @@ export interface ChatGPTMessage {
 }
 
 export interface OpenAiStreamPayload {
-    model: string;
-    messages: ChatGPTMessage[];
-    temperature: number; // creativity,
-    top_p: number;
-    frequency_penalty: number; // how often certain word will apear
-    presence_penalty: number; // if words are already present in prompt, hight presence penalty(0-2) less likely to use those words
-    max_tokens: number; // 1 token roughly equals 4 letters
-    stream: boolean;
-    n: number;
+    messages: ChatGPTMessage[]; // Required
+    model: string; // Required
+    // frequency_penalty: number; // Optional, default: 0
+    // logit_bias: null; // Optional, default: null
+    // logprobs: boolean; // Optional, default: false
+    // top_logprobs: number; // Optional
+    // max_tokens: number; // Optional
+    // n: number; // Optional, default: 1
+    // presence_penalty: number; // Optional, default: 0
+    // response_format: object; // Optional
+    // seed: number; // Optional
+    // stop: string | string[]; // Optional, default: null
+    stream: boolean; // Optional, default: false
+    // temperature: number; // Optional, default: 1
+    // top_p: number; // Optional, default: 1
+    // tools: string[]; // Optional
+    // tool_choice: string | object; // Optional
+    // user: string; // Optional
 }
 
 // Crux of application
 export async function OpenAIStream(payload: OpenAiStreamPayload) {
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
-
-    let counter = 0;
-
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -38,6 +42,10 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
         },
         body: JSON.stringify(payload),
     });
+
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    let counter = 0;
 
     const stream = new ReadableStream({
         async start(controller) {
@@ -48,18 +56,14 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
                         controller.close();
                         return;
                     }
-
                     try {
                         // data to text logic
                         const json = JSON.parse(data);
-                        console.log("json", json);
                         const text = json.choices[0].delta?.content || "";
-                        console.log("text", text);
 
                         if (counter < 2 && (text.match(/\n/) || []).length) {
                             return;
                         }
-
                         const queue = encoder.encode(text);
                         controller.enqueue(queue);
                         counter++;
@@ -69,12 +73,10 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
                 }
             }
             const parser = createParser(onParse);
-
             for await (const chunk of res.body as any) {
                 parser.feed(decoder.decode(chunk));
             }
         },
     });
-
     return stream;
 }

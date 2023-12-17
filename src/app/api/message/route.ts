@@ -1,14 +1,16 @@
 import { MessageArraySchema } from "@/lib/validators/message";
 import {
     ChatGPTMessage,
-    OpenAIStream,
     OpenAiStreamPayload,
+    OpenAIStream,
 } from "@/lib/openai-stream";
 import { chatbotPrompt } from "@/helpers/constants/chatbot-prompt";
 
 export async function POST(req: Request) {
+    // get messages from request body
     const { messages } = await req.json();
 
+    // validate messages array using zod
     const parsedMessages = MessageArraySchema.parse(messages);
 
     const outboundMessages: ChatGPTMessage[] = parsedMessages.map(
@@ -18,21 +20,17 @@ export async function POST(req: Request) {
         })
     );
 
+    // add system prompt to outbound messages
     outboundMessages.unshift({
         role: "system",
         content: chatbotPrompt,
     });
 
+    // create payload for openai
     const payload: OpenAiStreamPayload = {
-        model: "gpt-3.5-turbo",
         messages: outboundMessages,
-        temperature: 0.4,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-        max_tokens: 150,
+        model: "gpt-3.5-turbo",
         stream: true,
-        n: 1,
     };
 
     // create readable stream
