@@ -1,13 +1,5 @@
-import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import {
-    FC,
-    HTMLAttributes,
-    useContext,
-    useState,
-    useRef,
-    useEffect,
-} from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 import TextAreaAutosize from "react-textarea-autosize";
 import { nanoid } from "nanoid";
 import { Message } from "@/lib/validators/message";
@@ -15,17 +7,10 @@ import { MessagesContext } from "@/context/messages";
 import { CornerDownLeft, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {}
-
-const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
+const ChatInput = () => {
     const [input, setInput] = useState<string>("");
-    const {
-        messages,
-        addMessage,
-        removeMessage,
-        updateMessage,
-        setIsMessageUpdating,
-    } = useContext(MessagesContext);
+    const { addMessage, removeMessage, updateMessage, setIsMessageUpdating } =
+        useContext(MessagesContext);
 
     const textareaRef = useRef<null | HTMLTextAreaElement>(null);
 
@@ -95,7 +80,7 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
     }, [isSuccess, isError]);
 
     return (
-        <div {...props} className={cn("border-t border-zinc-300", className)}>
+        <div className="border-t border-zinc-300 px-2">
             <div className="relative mt-4 flex-1 overflow-hidden rounded-lg border-none outline-none">
                 <TextAreaAutosize
                     ref={textareaRef}
