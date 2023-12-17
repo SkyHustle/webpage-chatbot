@@ -1,23 +1,14 @@
 import { MessagesContext } from "@/context/messages";
 import { cn } from "@/lib/utils";
-import { FC, HTMLAttributes, useContext } from "react";
+import { useContext } from "react";
 import MarkdownLite from "./MarkdownLite";
 
-// allows us to pass any prop that a normal div would take
-interface ChatMessagesProps extends HTMLAttributes<HTMLDivElement> {}
-
-const ChatMessages: FC<ChatMessagesProps> = ({ className, ...props }) => {
+const ChatMessages = () => {
     const { messages } = useContext(MessagesContext);
     const inverseMessages = [...messages].reverse();
 
     return (
-        <div
-            {...props}
-            className={cn(
-                "flex flex-col-reverse gap-3 overflow-y-auto scrollbar-thumb-blue scorllbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch",
-                className
-            )}
-        >
+        <div className="flex flex-col-reverse gap-3 overflow-y-auto scrollbar-thumb-blue scorllbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch px-2 py-3 flex-1">
             <div className="flex-1 flex-grow" />
             {inverseMessages.map((message) => (
                 <div key={message.id} id="chat-message">
