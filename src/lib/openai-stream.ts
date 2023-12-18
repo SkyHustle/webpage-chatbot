@@ -49,7 +49,7 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
 
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
-    // let counter = 0;
+    let counter = 0;
 
     const stream = new ReadableStream({
         async start(controller) {
@@ -62,19 +62,17 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
                         return;
                     }
                     try {
-                        // data to text logic
+                        // data to text logic. data is coming in as a stringified json object
                         const json = JSON.parse(data);
-                        console.log("JSON \n", json);
                         const text = json.choices[0].delta?.content || "";
-                        console.log("TEXT \n", text);
 
-                        // if (counter < 2 && (text.match(/\n/) || []).length) {
-                        //     return;
-                        // }
+                        // if prefixed character, do nothing
+                        if (counter < 2 && (text.match(/\n/) || []).length) {
+                            return;
+                        }
                         const queue = encoder.encode(text);
-                        console.log("QUEUE \n", queue);
                         controller.enqueue(queue);
-                        // counter++;
+                        counter++;
                     } catch (error) {
                         controller.error(error);
                     }

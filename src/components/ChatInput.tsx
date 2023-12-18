@@ -32,7 +32,7 @@ const ChatInput = () => {
             if (!response.ok) {
                 throw new Error();
             }
-            console.log("Response body: ", response.body);
+
             return response.body;
         },
         // optimistic update to messages area
@@ -57,17 +57,14 @@ const ChatInput = () => {
             setIsMessageUpdating(true);
 
             const reader = stream.getReader();
-            console.log("Reader: ", reader);
             const decoder = new TextDecoder();
             let done = false;
 
             while (!done) {
                 const { value, done: doneReading } = await reader.read();
-                console.log("Value: ", value);
-                console.log("Done: ", doneReading);
                 done = doneReading;
                 const chunkValue = decoder.decode(value);
-                console.log("chunkValue: ", chunkValue);
+                console.log(chunkValue);
                 updateMessage(id, (prev) => prev + chunkValue);
             }
             setIsMessageUpdating(false);
