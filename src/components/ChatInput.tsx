@@ -4,7 +4,7 @@ import TextAreaAutosize from "react-textarea-autosize";
 import { nanoid } from "nanoid";
 import { Message } from "@/lib/validators/message";
 import { MessagesContext } from "@/context/messages";
-import { CornerDownLeft, Loader2 } from "lucide-react";
+import { CornerDownLeft, DatabaseBackup, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 const ChatInput = () => {
@@ -32,12 +32,7 @@ const ChatInput = () => {
             if (!response.ok) {
                 throw new Error();
             }
-            console.log(
-                "Response: ",
-                response,
-                "Response body: ",
-                response.body
-            );
+            console.log("Response body: ", response.body);
             return response.body;
         },
         // optimistic update to messages area
@@ -62,14 +57,17 @@ const ChatInput = () => {
             setIsMessageUpdating(true);
 
             const reader = stream.getReader();
+            console.log("Reader: ", reader);
             const decoder = new TextDecoder();
             let done = false;
 
             while (!done) {
                 const { value, done: doneReading } = await reader.read();
+                console.log("Value: ", value);
+                console.log("Done: ", doneReading);
                 done = doneReading;
                 const chunkValue = decoder.decode(value);
-                // console.log(chunkValue);
+                console.log("chunkValue: ", chunkValue);
                 updateMessage(id, (prev) => prev + chunkValue);
             }
             setIsMessageUpdating(false);

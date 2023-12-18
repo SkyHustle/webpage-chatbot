@@ -43,15 +43,20 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
         body: JSON.stringify(payload),
     });
 
+    if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
-    let counter = 0;
+    // let counter = 0;
 
     const stream = new ReadableStream({
         async start(controller) {
             function onParse(event: ParsedEvent | ReconnectInterval) {
                 if (event.type === "event") {
                     const data = event.data;
+
                     if (data === "[DONE]") {
                         controller.close();
                         return;
@@ -59,14 +64,17 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
                     try {
                         // data to text logic
                         const json = JSON.parse(data);
+                        console.log("JSON \n", json);
                         const text = json.choices[0].delta?.content || "";
+                        console.log("TEXT \n", text);
 
-                        if (counter < 2 && (text.match(/\n/) || []).length) {
-                            return;
-                        }
+                        // if (counter < 2 && (text.match(/\n/) || []).length) {
+                        //     return;
+                        // }
                         const queue = encoder.encode(text);
+                        console.log("QUEUE \n", queue);
                         controller.enqueue(queue);
-                        counter++;
+                        // counter++;
                     } catch (error) {
                         controller.error(error);
                     }
@@ -78,5 +86,6 @@ export async function OpenAIStream(payload: OpenAiStreamPayload) {
             }
         },
     });
+
     return stream;
 }
